@@ -22,6 +22,7 @@ use Zend\Db\Sql\Select as ZendSelect;
 use Zend\Db\Sql\SqlInterface;
 use Zend\Db\Sql\TableIdentifier;
 use Zend\Db\Sql\Where;
+use Nette\Diagnostics\Debugger;
 
 /**
  * Class Select
@@ -308,12 +309,13 @@ class Select extends ZendSelect implements SqlInterface, PreparableSqlInterface
                     $column,
                     $platform,
                     $driver,
+                    $parameterContainer,
                     $this->processInfo['paramPrefix'] . ((is_string($columnIndexOrAs)) ? $columnIndexOrAs : 'column')
                 );
                 if ($parameterContainer) {
                     $parameterContainer->merge($columnParts->getParameterContainer());
                 }
-                $colName .= $columnParts->getSql();
+                $colName .= $columnParts;
             } else {
                 // Sphinx doesn't not support prefix column with table, yet
                 $colName .= $platform->quoteIdentifier($column);
@@ -368,6 +370,7 @@ class Select extends ZendSelect implements SqlInterface, PreparableSqlInterface
         ExpressionInterface $expression,
         PlatformInterface $platform,
         DriverInterface $driver = null,
+        ParameterContainer $parameterContainer = null,
         $namedParameterPrefix = null
     ) {
         if ($expression instanceof ExpressionDecorator) {
@@ -376,7 +379,7 @@ class Select extends ZendSelect implements SqlInterface, PreparableSqlInterface
             $expressionDecorator = new ExpressionDecorator($expression, $platform);
         }
 
-        return parent::processExpression($expressionDecorator, $platform, $driver, $namedParameterPrefix);
+        return parent::processExpression($expressionDecorator, $platform, $driver, $parameterContainer, $namedParameterPrefix);
     }
 
     protected function processWithinGroupOrder(
@@ -461,7 +464,7 @@ class Select extends ZendSelect implements SqlInterface, PreparableSqlInterface
             $optionSql = '';
             if ($optValue instanceof Expression) {
                 $parameterPrefix = $this->processInfo['paramPrefix'] . 'option';
-                $optionParts = $this->processExpression($optValue, $platform, $driver, $parameterPrefix);
+                $optionParts = $this->processExpression($optValue, $platform, $driver, $parameterContainer, $parameterPrefix);
                 if ($parameterContainer) {
                     $parameterContainer->merge($optionParts->getParameterContainer());
                 }
