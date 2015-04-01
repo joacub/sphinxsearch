@@ -1,5 +1,5 @@
 {
-    "name": "ripaclub/sphinxsearch",
+    "name": "joacub/sphinxsearch",
     "description": "Sphinx Search library provides SphinxQL indexing and searching features",
     "homepage": "https://github.com/ripaclub/sphinxsearch",
     "license": "BSD-2-Clause",
